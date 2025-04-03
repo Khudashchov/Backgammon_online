@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backgammon Board</title>
+    <link rel="stylesheet" href="main.css">
+</head>
+<body>
+    <div class="board">
+        <div class="side">
+            <div class="row">
+                <div class="triangle"></div>
+                <div class="triangle"></div>
+                <div class="triangle"></div>
+                <div class="triangle"></div>
+                <div class="triangle"></div>
+                <div class="triangle"></div>
+            </div>
+            <div class="row">
+                <div class="triangle"></div>
+                <div class="triangle"></div>
+                <div class="triangle"></div>
+                <div class="triangle"></div>
+                <div class="triangle"></div>
+                <div class="triangle"></div>
+            </div>
+        </div>
+        <div class="divider"></div>
+        <div class="side">
+            <div class="row">
+                <div class="triangle"></div>
+                <div class="triangle"></div>
+                <div class="triangle"></div>
+                <div class="triangle"></div>
+                <div class="triangle"></div>
+                <div class="triangle"></div>
+            </div>
+            <div class="row">
+                <div class="triangle"></div>
+                <div class="triangle"></div>
+                <div class="triangle"></div>
+                <div class="triangle"></div>
+                <div class="triangle"></div>
+                <div class="triangle"></div>
+            </div>
+        </div>
+        <div class="chips">
+            <div class="chip" id="chip1" style="top: 138px; left: 8px;" data-initial-position="8,138"></div>
+            <div class="chip" id="chip2" style="top: 169px; left: 8px;" data-initial-position="8,169"></div>
+            <div class="chip" id="chip3" style="top: 200px; left: 8px;" data-initial-position="8,200"></div>
+            <div class="chip" id="chip4" style="top: 231px; left: 8px;" data-initial-position="8,231"></div>
+            <div class="chip" id="chip5" style="top: 262px; left: 8px;" data-initial-position="8,262"></div>
+            <div class="chip" id="chip6" style="top: 293px; left: 8px;" data-initial-position="8,293"></div>
+            <div class="chip" id="chip7" style="top: 324px; left: 8px;" data-initial-position="8,324"></div>
+            <div class="chip" id="chip8" style="top: 355px; left: 8px;" data-initial-position="8,355"></div>
+            <div class="chip" id="chip9" style="top: 386px; left: 8px;" data-initial-position="8,386"></div>
+            <div class="chip" id="chip10" style="top: 417px; left: 8px;" data-initial-position="8,417"></div>
+            <div class="chip" id="chip11" style="top: 448px; left: 8px;" data-initial-position="8,448"></div>
+            <div class="chip" id="chip12" style="top: 479px; left: 8px;" data-initial-position="8,479"></div>
+            <div class="chip" id="chip13" style="top: 510px; left: 8px;" data-initial-position="8,510"></div>
+            <div class="chip" id="chip14" style="top: 541px; left: 8px;" data-initial-position="8,541"></div>
+            <div class="chip" id="chip15" style="top: 572px; left: 8px;" data-initial-position="8,572"></div>
+            <div class="chip_b" id="chip16" style="top: 0px; left: 788px;" data-initial-position="788,0"></div>
+            <div class="chip_b" id="chip17" style="top: 31px; left: 788px;" data-initial-position="788,31"></div>
+            <div class="chip_b" id="chip18" style="top: 62px; left: 788px;" data-initial-position="788,62"></div>
+            <div class="chip_b" id="chip19" style="top: 93px; left: 788px;" data-initial-position="788,93"></div>
+            <div class="chip_b" id="chip20" style="top: 124px; left: 788px;" data-initial-position="788,124"></div>
+            <div class="chip_b" id="chip21" style="top: 155px; left: 788px;" data-initial-position="788,155"></div>
+            <div class="chip_b" id="chip22" style="top: 186px; left: 788px;" data-initial-position="788,186"></div>
+            <div class="chip_b" id="chip23" style="top: 217px; left: 788px;" data-initial-position="788,217"></div>
+            <div class="chip_b" id="chip24" style="top: 248px; left: 788px;" data-initial-position="788,248"></div>
+            <div class="chip_b" id="chip25" style="top: 279px; left: 788px;" data-initial-position="788,279"></div>
+            <div class="chip_b" id="chip26" style="top: 310px; left: 788px;" data-initial-position="788,310"></div>
+            <div class="chip_b" id="chip27" style="top: 341px; left: 788px;" data-initial-position="788,341"></div>
+            <div class="chip_b" id="chip28" style="top: 372px; left: 788px;" data-initial-position="788,372"></div>
+            <div class="chip_b" id="chip29" style="top: 403px; left: 788px;" data-initial-position="788,403"></div>
+            <div class="chip_b" id="chip30" style="top: 434px; left: 788px;" data-initial-position="788,434"></div>
+        </div>
+    </div>
+    <button class="button_1" type="button">Play</button>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
