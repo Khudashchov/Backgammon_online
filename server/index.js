@@ -1,12 +1,15 @@
+const { saveGameState } = require('./excel');
+const { saveRoomToExcel } = require('./excel');
+
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
 const path = require('path');
-
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 
+let rooms = [];
 let gameState = [];
 let playersReady = 0;
 
@@ -17,37 +20,118 @@ app.get('/', (req, res) => {
 });
 
 io.on('connection', (socket) => {
-    console.log('New client connected: ', socket.id);
+    console.log('Користувач підключився:', socket.id);
 
-    socket.emit('updateGameState', gameState);
+    const newPlayer = { id: socket.id, status: 'Online' };
+    gameState.push(newPlayer);
 
-    socket.on('playerReady', () => {
-        playersReady += 1;
-        console.log(`Player ${socket.id} is ready`);
+    saveGameState(gameState);
 
-        if (playersReady === 2) {
-            io.emit('startGame');
-            playersReady = 0;
+    io.emit('playerJoined', newPlayer);
+
+    socket.on('play', () => {
+        const player = gameState.find(p => p.id === socket.id);
+        if (player) {
+            player.status = 'Waiting';
+            saveGameState(gameState);
+            io.emit('updatePlayerStatuses', gameState);
+            checkForRoom();
+        }
+    });
+    
+
+    socket.on('setOnlineStatus', () => {
+        const player = gameState.find(p => p.id === socket.id);
+        if (player) {
+            player.status = 'Online';
+            saveGameState(gameState);
+            io.emit('updatePlayerStatuses', gameState);
         }
     });
 
-    socket.on('movePiece', ({ id, left, bottom }) => {
-        console.log(`Move piece received: ${id}, left: ${left}, bottom: ${bottom}`);
-        const pieceIndex = gameState.findIndex(piece => piece.id === id);
-        if (pieceIndex !== -1) {
-            gameState[pieceIndex].left = left;
-            gameState[pieceIndex].bottom = bottom;
+    socket.on('movePiece', ({ roomId, pieceId, left, top }) => {
+        console.log(`Move received in room ${roomId}: ${pieceId}, left: ${left}, top: ${top}`);
+        
+        const room = rooms.find(r => r.id === roomId);
+        if (!room) return;
+    
+        const player = gameState.find(p => room.players.includes(p.id));
+        if (player) {
+            let piece = player.pieces.find(p => p.id === pieceId);
+            if (piece) {
+                piece.left = left;
+                piece.top = top;
+            } else {
+                player.pieces.push({ id: pieceId, left, top });
+            }
+        }
+    
+        io.to(roomId).emit('updateGameState', gameState);
+        saveGameState(gameState);
+    });
+    
+    function generateRoomId() {
+        return Math.random().toString(36).substr(2, 6).toUpperCase();
+    }
+    
+    socket.on('joinRoom', (roomId) => {
+        if (!roomId) {
+            roomId = generateRoomId();
+        }
+    
+        socket.join(roomId);
+        
+        let player = gameState.find(p => p.id === socket.id);
+        if (player) {
+            player.status = 'InGame';
+            player.roomId = roomId;
         } else {
-            gameState.push({ id, left, bottom });
+            player = { id: socket.id, status: 'InGame', roomId };
+            gameState.push(player);
         }
-
-        io.emit('updateGameState', gameState);
+    
+        players[socket.id] = player;
+    
+        saveGameState(gameState);
+        io.emit('updatePlayerStatuses', gameState);
     });
-
+    
+    
     socket.on('disconnect', () => {
         console.log('Client disconnected: ', socket.id);
+        const player = gameState.find(p => p.id === socket.id);
+        if (player) {
+            player.status = 'Disconnected';
+            saveGameState(gameState);
+            io.emit('updatePlayerStatuses', gameState);
+        }
     });
 });
+
+function checkForRoom() {
+    const waitingPlayers = gameState.filter(p => p.status === 'Waiting');
+
+    if (waitingPlayers.length >= 2) {
+        const player1 = waitingPlayers.shift();
+        const player2 = waitingPlayers.shift();
+        const roomId = `room_${player1.id}_${player2.id}`;
+
+        rooms.push({ id: roomId, players: [player1.id, player2.id] });
+
+        player1.status = 'InGame';
+        player2.status = 'InGame';
+        player1.roomId = roomId;
+        player2.roomId = roomId;
+
+        io.to(player1.id).emit('joinRoom', roomId);
+        io.to(player2.id).emit('joinRoom', roomId);
+
+        saveRoomToExcel(rooms);
+        saveGameState(gameState);
+        io.emit('updatePlayerStatuses', gameState);
+    }
+}
+
 
 const PORT = 3000;
 server.listen(PORT, () => {

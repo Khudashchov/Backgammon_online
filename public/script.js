@@ -2,18 +2,21 @@ const socket = io();
 const caseWidth = 70; // Ширина одного кейса
 const caseHeight = 125; // Висота одного кейса
 let gameActive = false;
+let currentRoom = null;
 
 // Кнопка старту гри
 document.querySelector('.button_1').addEventListener('click', () => {
-    gameActive = !gameActive; // Toggle game state
+    gameActive = !gameActive; 
 
     if (gameActive) {
         socket.emit('startGame');
-
+        socket.emit('play');
         const playButton = document.querySelector('.button_1');
         playButton.classList.add('active');
     } else {
         socket.emit('stopGame');
+        socket.emit('setOnlineStatus');
+
         resetChips();
         const playButton = document.querySelector('.button_1');
         playButton.classList.remove('active');
@@ -78,7 +81,7 @@ function dragChip(e, chip, offsetX, offsetY) {
 
     // Встановлюємо обмеження для осі X
     if (newPositionX >= minPositionX && newPositionX <= maxPositionX) {
-        let snappedPositionX = Math.round(newPositionX / caseWidth) * caseWidth; // Округлення до найближчої позиції
+        let snappedPositionX = Math.round(newPositionX / caseWidth) * caseWidth;
         chip.style.left = `${snappedPositionX}px`;
 
         // Визначення позиції Y
@@ -106,8 +109,11 @@ function resetChips() {
 }
 
 // Оновлення гри
-socket.on('updateGameState', (pieces) => {
-    pieces.forEach(piece => {
+socket.on('updateGameState', (gameState) => {
+    const roomData = gameState.find(player => player.roomId === currentRoom);
+    if (!roomData) return;
+
+    roomData.pieces.forEach(piece => {
         const chip = document.getElementById(piece.id);
         if (chip) {
             chip.style.left = `${piece.left}px`;
@@ -116,7 +122,18 @@ socket.on('updateGameState', (pieces) => {
     });
 });
 
-// Оновлення статусів гравців
+socket.emit('createRoom');
+socket.on('joinRoom', (roomId) => {
+    console.log(`Ви приєдналися до кімнати: ${roomId}`);
+    sessionStorage.setItem('currentRoom', roomId);
+    currentRoom = roomId;
+});
+
 socket.on('updatePlayerStatuses', (statuses) => {
-    console.log('Player statuses updated: ', statuses);
+    console.log('Player statuses updated:', statuses);
+
+    const player = statuses.find(p => p.id === socket.id);
+    if (player && player.status === 'InGame' && !currentRoom) {
+        console.log("Waiting for room assignment...");
+    }
 });
