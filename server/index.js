@@ -1,12 +1,11 @@
-const { saveGameState } = require('./excel');
-const { saveRoomToExcel } = require('./excel');
+const { saveGameState } = require('./Mongo');
+const { saveRoom } = require('./Mongo');
 
 const express = require('express');
-const http = require('http');
 const socketIo = require('socket.io');
 const path = require('path');
 const app = express();
-const server = http.createServer(app);
+const server = require('http').createServer(app);
 const io = socketIo(server);
 
 let rooms = [];
@@ -20,7 +19,7 @@ app.get('/', (req, res) => {
 });
 
 io.on('connection', (socket) => {
-    console.log('Користувач підключився:', socket.id);
+    console.log('Client connected:', socket.id);
 
     const newPlayer = { id: socket.id, status: 'Online' };
     gameState.push(newPlayer);
@@ -101,7 +100,7 @@ io.on('connection', (socket) => {
         console.log('Client disconnected: ', socket.id);
         const player = gameState.find(p => p.id === socket.id);
         if (player) {
-            player.status = 'Disconnected';
+            player.status = 'Offline';
             saveGameState(gameState);
             io.emit('updatePlayerStatuses', gameState);
         }
@@ -111,22 +110,38 @@ io.on('connection', (socket) => {
 function checkForRoom() {
     const waitingPlayers = gameState.filter(p => p.status === 'Waiting');
 
-    if (waitingPlayers.length >= 2) {
+    // if (waitingPlayers.length >= 2) {
+    //     const player1 = waitingPlayers.shift();
+    //     const player2 = waitingPlayers.shift();
+    //     const roomId = `room_${player1.id}_${player2.id}`;
+
+    //     rooms.push({ id: roomId, players: [player1.id, player2.id] });
+
+    //     player1.status = 'InGame';
+    //     player2.status = 'InGame';
+    //     player1.roomId = roomId;
+    //     player2.roomId = roomId;
+
+    //     io.to(player1.id).emit('joinRoom', roomId);
+    //     io.to(player2.id).emit('joinRoom', roomId);
+
+    //     saveRoomToExcel(rooms);
+    //     saveGameState(gameState);
+    //     io.emit('updatePlayerStatuses', gameState);
+    // }
+
+    if (waitingPlayers.length >= 1) {
         const player1 = waitingPlayers.shift();
-        const player2 = waitingPlayers.shift();
-        const roomId = `room_${player1.id}_${player2.id}`;
-
-        rooms.push({ id: roomId, players: [player1.id, player2.id] });
-
+        const roomId = `room_${player1.id}_testRoom`;
+    
+        rooms.push({ id: roomId, players: [player1.id] });
+    
         player1.status = 'InGame';
-        player2.status = 'InGame';
         player1.roomId = roomId;
-        player2.roomId = roomId;
-
+    
         io.to(player1.id).emit('joinRoom', roomId);
-        io.to(player2.id).emit('joinRoom', roomId);
-
-        saveRoomToExcel(rooms);
+    
+        saveRoom(rooms);
         saveGameState(gameState);
         io.emit('updatePlayerStatuses', gameState);
     }
