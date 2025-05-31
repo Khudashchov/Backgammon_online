@@ -39,6 +39,7 @@ body {
     border-left: 35px solid transparent;
     border-right: 35px solid transparent;
     border-bottom: 250px solid #C0D904;
+    position: relative;
 }
 
 .triangle:nth-child(even) {
@@ -63,11 +64,41 @@ body {
     border-radius: 50%;
     position: absolute;
     z-index: 3;
+    transition: top 0.3s ease;
 }
 
 .chip_b {
     background-color: black;
     border: 1px solid white;
+}
+
+/* Stack styling */
+.stack {
+    position: relative;
+    width: 50px;
+    height: auto;
+}
+
+.stack .chip, .stack .chip_b {
+    position: absolute;
+    margin-top: -40px; /* Overlap between pieces */
+}
+
+.stack .chip:first-child, .stack .chip_b:first-child {
+    margin-top: 0;
+}
+
+/* Top stack */
+.triangle .stack {
+    position: absolute;
+    top: 0;
+    left: -25px;
+}
+
+/* Bottom stack */
+.row:last-child .triangle .stack {
+    bottom: 0;
+    top: auto;
 }
 
 .button_1, .button_2 {

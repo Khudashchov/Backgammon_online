@@ -1,7 +1,9 @@
 class Dice {
     roll() {
-        const dice1 = Math.floor(Math.random() * 6) + 1;
-        const dice2 = Math.floor(Math.random() * 6) + 1; 
-        return [dice1, dice2]; 
+        const die1 = Math.floor(Math.random() * 6) + 1;
+        const die2 = Math.floor(Math.random() * 6) + 1;
+        return [die1, die2];
     }
 }
+
+module.exports = Dice;

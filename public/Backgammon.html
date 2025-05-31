@@ -79,7 +79,15 @@
         </div>
     </div>
     <button class="button_1" type="button">Play</button>
+    <div id="game_info">
+        <div id="dice_display"></div>
+        <div id="turn_display"></div>
+        <div id="status_display"></div>
+    </div>
+
+    <!-- Load Socket.IO first -->
     <script src="/socket.io/socket.io.js"></script>
+    <!-- Then load our game script -->
     <script src="script.js"></script>
 </body>
 </html>
