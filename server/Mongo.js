@@ -106,5 +106,47 @@ async function saveRoom(rooms) {
     }
 }
 
-module.exports = { saveRoom, saveGameState };
+async function removeRoom(roomId) {
+    const client = new MongoClient(url, { useNewUrlParser: true, useUnifiedTopology: true });
+    try {
+        await client.connect();
+        const db = client.db(dbName);
+        const roomsCollection = db.collection('rooms');
+
+        // Видалити кімнату за її ID
+        const result = await roomsCollection.deleteOne({ roomId });
+        if (result.deletedCount > 0) {
+            console.log(`Кімната ${roomId} успішно видалена`);
+        } else {
+            console.log(`Кімната ${roomId} не знайдена`);
+        }
+    } catch (error) {
+        console.error("Помилка при видаленні кімнати:", error);
+    } finally {
+        await client.close();
+    }
+}
+
+
+async function removePlayer(playerId) {
+    const client = new MongoClient(url, { useNewUrlParser: true, useUnifiedTopology: true });
+    try {
+        await client.connect();
+        const db = client.db(dbName);
+        const playersCollection = db.collection('players'); // Колекція для гравців
+
+        // Видалити гравця за його ID
+        const result = await playersCollection.deleteOne({ id: playerId });
+        if (result.deletedCount > 0) {
+            console.log(`Гравець ${playerId} успішно видалений з бази даних`);
+        } else {
+            console.log(`Гравець ${playerId} не знайдений у базі даних`);
+        }
+    } catch (error) {
+        console.error("Помилка при видаленні гравця:", error);
+    } finally {
+        await client.close();
+    }
+}
+module.exports = { saveRoom, saveGameState, removeRoom, removePlayer };
 

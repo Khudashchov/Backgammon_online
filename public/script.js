@@ -53,7 +53,7 @@ document.querySelectorAll('.chip, .chip_b').forEach(chip => {
             }
             // Відправка нових координат на сервер
             socket.emit('movePiece', {
-                roomId: 'room_1',
+                roomId: currentRoom,
                 pieceId: chipId,
                 left: snappedPosition,
                 top: parseInt(chip.style.top) || 0
@@ -120,6 +120,15 @@ socket.on('updateGameState', (gameState) => {
             chip.style.top = `${piece.top}px`;
         }
     });
+});
+
+socket.on('updatePiece', ({ pieceId, left, top }) => {
+    console.log(`Received move update: ${pieceId}, left: ${left}, top: ${top}`);
+    const chip = document.getElementById(pieceId);
+    if (chip) {
+        chip.style.left = `${left}px`;
+        chip.style.top = `${top}px`;
+    }
 });
 
 socket.emit('createRoom');
